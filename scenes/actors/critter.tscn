@@ -1,0 +1,115 @@
+[gd_scene load_steps=15 format=3 uid="uid://d2delsadu30xd"]
+
+[ext_resource type="Script" path="res://scenes/actors/critter.gd" id="1_mtbxd"]
+[ext_resource type="Texture2D" uid="uid://cc6wseimb5adu" path="res://assets/images/tbh.png" id="2_ptf6p"]
+[ext_resource type="FontFile" uid="uid://rhtfngokkber" path="res://assets/fonts/NotJamChunkySans6/NotJamChunkySans.ttf" id="3_an0v0"]
+[ext_resource type="Texture2D" uid="uid://c4oblrr5qs42n" path="res://assets/images/tbh_walk.png" id="3_ppbtg"]
+[ext_resource type="Script" path="res://scenes/state_machine/state_machine.gd" id="5_hcx1j"]
+[ext_resource type="Script" path="res://scenes/actors/states/walking.gd" id="6_qmo78"]
+[ext_resource type="Script" path="res://scenes/actors/states/falling.gd" id="7_n0ufn"]
+[ext_resource type="Script" path="res://scenes/actors/move_component.gd" id="8_q3o53"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_x6ohq"]
+atlas = ExtResource("3_ppbtg")
+region = Rect2(0, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tscjn"]
+atlas = ExtResource("3_ppbtg")
+region = Rect2(16, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hn3iv"]
+atlas = ExtResource("3_ppbtg")
+region = Rect2(32, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kmlhn"]
+atlas = ExtResource("3_ppbtg")
+region = Rect2(48, 0, 16, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_x8y5r"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_ptf6p")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_x6ohq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tscjn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hn3iv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kmlhn")
+}],
+"loop": true,
+"name": &"walking",
+"speed": 8.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tvg78"]
+size = Vector2(14, 15)
+
+[node name="Critter" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 5
+script = ExtResource("1_mtbxd")
+
+[node name="Animations" type="AnimatedSprite2D" parent="."]
+position = Vector2(0, -8)
+sprite_frames = SubResource("SpriteFrames_x8y5r")
+animation = &"walking"
+frame_progress = 0.828053
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -7.5)
+shape = SubResource("RectangleShape2D_tvg78")
+
+[node name="Control" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 0
+offset_top = -16.0
+offset_bottom = -16.0
+
+[node name="Label" type="Label" parent="Control"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -34.0
+offset_top = -23.0
+offset_right = 34.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
+theme_override_fonts/font = ExtResource("3_an0v0")
+theme_override_font_sizes/font_size = 6
+text = "idk dude"
+horizontal_alignment = 1
+
+[node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("starting_state")]
+script = ExtResource("5_hcx1j")
+starting_state = NodePath("Falling")
+
+[node name="Walking" type="Node" parent="StateMachine" node_paths=PackedStringArray("fall_state")]
+script = ExtResource("6_qmo78")
+fall_state = NodePath("../Falling")
+animation_name = "walking"
+
+[node name="Falling" type="Node" parent="StateMachine" node_paths=PackedStringArray("walk_state")]
+script = ExtResource("7_n0ufn")
+walk_state = NodePath("../Walking")
+animation_name = "idle"
+
+[node name="MoveComponent" type="Node" parent="."]
+script = ExtResource("8_q3o53")
